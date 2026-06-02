@@ -33,7 +33,7 @@ const createUser = async (req: Request, res: Response) => {
 
 const getUserById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const user = await userService.getUserById(id);
 
     if (!user) {
@@ -89,17 +89,8 @@ const getAllUsers = async (req: Request, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-
-    if (req.body.email) {
-      const existingUser = await userService.getUserById(id);
-      if (!existingUser) {
-        return res.status(404).json({
-          success: false,
-          message: "User not found",
-        });
-      }
-    }
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+ 
 
     const user = await userService.updateUser(id, req.body);
     res.status(200).json({
@@ -130,7 +121,7 @@ const updateUser = async (req: Request, res: Response) => {
 
 const deleteUser = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const user = await userService.deleteUser(id);
     res.status(200).json({
       success: true,
