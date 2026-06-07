@@ -1,0 +1,224 @@
+generator client {
+  provider = "prisma-client-js"
+    output   = "../generated/prisma"
+  
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  student
+  tutor
+  admin
+}
+
+enum UserStatus {
+  active
+  banned
+  suspended
+}
+
+enum SessionStatus {
+  pending
+  approved
+  rejected
+}
+
+enum PaymentMethod {
+  card
+  bkash
+  nagad
+  sslcommerz
+  cash
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  failed
+  refunded
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id         String     @id @default(uuid())
+  firstName  String?
+  lastName   String?
+  email      String     @unique
+  password   String?
+  phone      String?
+  picture    String?
+  isVerified Boolean    @default(false)
+  role       UserRole   @default(student)
+  status     UserStatus @default(active)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  deletedAt  DateTime?
+
+  // Relations
+  courses     Course[]
+  enrollments Enrollment[]
+  reviews     Review[]
+  notes       StudentNote[]
+  materials   Material[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Course {
+  id                String        @id @default(uuid())
+  title             String
+  description       String?
+  registrationStart DateTime?
+  registrationEnd   DateTime?
+  classStart        DateTime?
+  classEnd          DateTime?
+  session           String?
+  registrationFee   Float         @default(0)
+  status            SessionStatus @default(pending)
+  tutorId           String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  deletedAt         DateTime?
+
+  // Relations
+  tutor           User?            @relation(fields: [tutorId], references: [id], onDelete: SetNull)
+  enrollments     Enrollment[]
+  reviews         Review[]
+  materials       Material[]
+  courseCategories CourseCategory[]
+
+  @@index([status])
+  @@index([tutorId])
+  @@map("courses")
+}
+
+model Enrollment {
+  id        String    @id @default(uuid())
+  userId    String
+  courseId  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // Flat fields from original "booked" collection (preserved for API compatibility)
+  sessionTitle    String?
+  tutorName       String?
+  tutorEmail      String?
+  studentEmail    String?
+  studentName     String?
+  registrationFee Float?
+  sessionImage    String?
+  sessionId       String?
+
+  // Relations
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  payment Payment?
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@map("enrollments")
+}
+
+model StudentNote {
+  id          String    @id @default(uuid())
+  studentId   String
+  title       String
+  description String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  student User @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@map("student_notes")
+}
+
+model Material {
+  id         String    @id @default(uuid())
+  title      String
+  courseId   String?
+  tutorEmail String?
+  tutorId    String?
+  link       String?
+  sessionId  String?
+  files      String[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  // Relations
+  course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  tutor  User?   @relation(fields: [tutorId], references: [id], onDelete: SetNull)
+
+  @@index([courseId])
+  @@map("materials")
+}
+
+model Review {
+  id          String    @id @default(uuid())
+  title       String?
+  description String?
+  rating      Int       @default(5)
+  courseId    String?
+  userId      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  // Relations
+  course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([courseId])
+  @@index([userId])
+  @@map("reviews")
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  enrollmentId  String        @unique
+  amount        Float
+  method        PaymentMethod @default(sslcommerz)
+  status        PaymentStatus @default(pending)
+  transactionId String?       @unique
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+
+  @@index([transactionId])
+  @@map("payments")
+}
+
+model Category {
+  id              String           @id @default(uuid())
+  name            String           @unique
+  createdAt       DateTime         @default(now())
+  courseCategories CourseCategory[]
+
+  @@map("categories")
+}
+
+model CourseCategory {
+  courseId   String
+  categoryId String
+
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([courseId, categoryId])
+  @@map("course_categories")
+}
