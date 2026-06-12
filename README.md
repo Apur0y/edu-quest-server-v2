@@ -12,7 +12,6 @@ Key improvements over v1:
 - ⚙️ **Cleaner architecture** — modular, scalable codebase built for long-term maintainability
 - ✅ **100% API-compatible** — existing frontend integrations continue to work without changes
 ---
----
 
 ## Tech Stack
 
