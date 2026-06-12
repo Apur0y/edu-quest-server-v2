@@ -1,21 +1,17 @@
 # EduQuest Backend — Modernized
 
-> Node.js + Express + TypeScript + PostgreSQL + Prisma  
-> 100% API-compatible migration from MongoDB/JavaScript monolith
-
----
-
-About
-
-This is the second version of the EduQuest backend server — a complete rewrite of the original MongoDB/JavaScript monolith into a more secure, scalable, and maintainable architecture using modern tooling.
-
+## About
+ 
+>This is the **second version** of the EduQuest backend server — a complete rewrite of the original MongoDB/JavaScript monolith into a more **secure, scalable, and maintainable** architecture using modern tooling.
+ 
 Key improvements over v1:
-🔒 Stronger security — improved validation, authentication, and authorization practices
-🛡️ Type safety — fully migrated to TypeScript to catch errors at compile time
-🗄️ Relational data modeling — moved from MongoDB to PostgreSQL with Prisma ORM for structured, reliable data and easier migrations
-⚙️ Cleaner architecture — modular, scalable codebase built for long-term maintainability
-✅ 100% API-compatible — existing frontend integrations continue to work without changes
-
+ 
+- 🔒 **Stronger security** — improved validation, authentication, and authorization practices
+- 🛡️ **Type safety** — fully migrated to **TypeScript** to catch errors at compile time
+- 🗄️ **Relational data modeling** — moved from MongoDB to **PostgreSQL** with **Prisma ORM** for structured, reliable data and easier migrations
+- ⚙️ **Cleaner architecture** — modular, scalable codebase built for long-term maintainability
+- ✅ **100% API-compatible** — existing frontend integrations continue to work without changes
+---
 ---
 
 ## Tech Stack
